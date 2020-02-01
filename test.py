@@ -15,27 +15,23 @@ def not_subject(a):
     return (a + 0.1) / 2
 
 
+def subject_check(parties, kbps):
+    for each in kbps:
+        if len(each.get('kbp')) > 0:
+            for i in parties:
+                if each.get('kbp')[0].get('subject') == i:
+                    parties[i] = subject(parties[i])
+    return parties
+
+
 text = 'Barack Obama was born in Hawaii.  He is the president. Obama was elected in 2008. His wife is Mitchell. She is nice. That is at least what people think. But they are crazy anyways.'
 
 result = json.loads(nlp.annotate(text, properties=props))
 
-r = result['sentences']
-
-# NERs
-for each in r:
-    q = each.get("tokens")
-    print(q)
-    for i in q:
-        print(i.get("word"), i.get("ner"))
+sentences = result['sentences']
 
 # Coref clusters
 corefs = result['corefs']
-for each in corefs.values():
-    print(each)
-
-# For identifying the subject
-for each in r:
-    print(each.get('kbp'))
 
 # Calculate rough values for party_probability
 parties = {}
@@ -45,9 +41,10 @@ for each in corefs.values():
 
 
 # Update probability if identified as a subject.
-kbps = result['sentences']
-for each in kbps:
-    if len(each.get('kbp')) > 0:
-        for i in parties:
-            if each.get('kbp')[0].get('subject') == i:
-                parties[i] = subject(parties[i])
+parties = subject_check(parties, sentences)
+
+print(parties)
+
+
+
+
