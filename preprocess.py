@@ -19,12 +19,10 @@ props = {'annotators': 'tokenize, ssplit, pos, lemma, parse, ner, coref, kbp, de
 def build_complete_ner(word, ner, l):
   if(l[0].get('ner') == ner):
     word = word + " " + build_complete_ner(l[0].get("word"), l[0].get('ner'), l[1:len(l)])
-  #print("built" + word)
   return word
 
 # To update parties based on ner
 def NER(sentences):
-  new_tokens = []
   replace_dict={}
   ner = []
     
@@ -33,10 +31,7 @@ def NER(sentences):
 
     for j in range(0,len(q)):
       if(q[j].get("ner") == "PERSON" or q[j].get("ner") == "ORGANIZATION"):
-        #print("test " + q[j].get("word"))
         word = build_complete_ner(q[j].get("word"), q[j].get("ner"), q[j+1 : len(q)])
-        # print("final"+word)
-
 
         #Build the prefix
         if(q[j].get("ner") == "PERSON"):
@@ -44,25 +39,17 @@ def NER(sentences):
         else:
             prefix = "O"
         prefix = prefix + str(len(ner)+1) + "$"
-
-        
+   
         if(j==0):
           ner.append(word)
           words = word.split(" ")
           for l in words:
             replace_dict[l] = (prefix+l)
-            new_tokens.append(prefix+l)
         if(j!=0 and q[j-1].get("ner") != q[j].get("ner")):
           ner.append(word)
-          # value.append(q[j].get("ner"))
-
           words = word.split(" ")
           for l in words:
             replace_dict[l] = (prefix+l)
-            new_tokens.append(prefix+l)
-
-      else:
-        new_tokens.append(q[j].get("word"))
   return replace_dict
 
 def preprocess(text):
